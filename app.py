@@ -198,7 +198,7 @@ with tab3:
             prod_data = df[df["Nombre"] == prod_seleccionado].iloc[0].to_dict()
             
             if st.button("Generar Estrategia y Guiones para esta Fase"):
-                with st.spinner("La IA esta adaptando los ganchos y guiones a tu fase actual..."):
+                with st.spinner("Conectando con la IA y redactando estrategia..."):
                     client = genai.Client(api_key=api_key)
                     
                     prompt = f"""
@@ -218,22 +218,37 @@ with tab3:
                     - Si es FASE 2 (1k a 3k): El objetivo es llevar trafico hacia el boton de Instagram o pedir comentarios como 'Comenta HUERTO para enviarte la guia gratuita por privado'.
                     - Si es FASE 3 (3k+): Objetivo vender el curso con oferta irresistible y cierre por WhatsApp.
 
-                    ENTREGA TU REPORTE CON ESTA ESTRUCTURA EXACTA:
-                    1. ENFOQUE DE LA FASE: Metrica principal a perseguir y estrategia clave de esta semana.
+                    ENTREGA TU REPORTE CON ESTA ESTRUCTURA:
+                    1. ENFOQUE DE LA FASE: Metrica principal y objetivo de esta semana.
                     2. 5 HOOKS VIRALES (Primeros 3 segundos):
-                       - Hook 1 (Curiosidad Visual): Que mostrar en pantalla + Texto + Audio hablado.
-                       - Hook 2 (Dolor / Error comun): Que mostrar en pantalla + Texto + Audio hablado.
-                       - Hook 3 (Contraintuitivo / Rompe Mitos): Que mostrar en pantalla + Texto + Audio hablado.
-                       - Hook 4 (Pregunta filtro): Que mostrar en pantalla + Texto + Audio hablado.
-                       - Hook 5 (Resultado rapido): Que mostrar en pantalla + Texto + Audio hablado.
-                    3. 2 GUIONES COMPLETOS DE 30 SEGUNDOS (Desglose segundo a segundo con Visual, Texto, Voz y el CTA exacto de la fase).
-                    4. ESTRATEGIA SINCRONIZADA TIKTOK + INSTAGRAM (Que publicar en TikTok y como apalancarlo en historias/reels de Instagram).
+                       - Hook 1 (Curiosidad Visual): Que mostrar + Texto + Audio.
+                       - Hook 2 (Dolor / Error comun): Que mostrar + Texto + Audio.
+                       - Hook 3 (Contraintuitivo): Que mostrar + Texto + Audio.
+                       - Hook 4 (Pregunta filtro): Que mostrar + Texto + Audio.
+                       - Hook 5 (Resultado rapido): Que mostrar + Texto + Audio.
+                    3. 2 GUIONES COMPLETOS DE 30 SEGUNDOS (Segundo a segundo con Visual, Texto, Voz y el CTA exacto de la fase).
+                    4. ESTRATEGIA SINCRONIZADA TIKTOK + INSTAGRAM (Que publicar en TikTok y como apalancarlo en Instagram).
                     """
                     
-                    response = client.models.generate_content(
-                        model="gemini-3.6-flash",
-                        contents=prompt
-                    )
-                    st.markdown(response.text)
+                    # Lista de modelos con respaldo automático
+                    modelos = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-pro"]
+                    respuesta_texto = None
+                    
+                    for mod in modelos:
+                        try:
+                            res = client.models.generate_content(
+                                model=mod,
+                                contents=prompt
+                            )
+                            if res and res.text:
+                                respuesta_texto = res.text
+                                break
+                        except Exception:
+                            continue
+                            
+                    if respuesta_texto:
+                        st.markdown(respuesta_texto)
+                    else:
+                        st.error("Los servidores de IA están saturados temporalmente. Intenta nuevamente en 30 segundos.")
         except Exception as e:
-            st.error(f"Error al conectar con la IA: {e}")
+            st.error(f"Error: {e}")
