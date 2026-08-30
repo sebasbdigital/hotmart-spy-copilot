@@ -35,7 +35,6 @@ def load_data():
     if os.path.exists(DATA_FILE):
         return pd.read_csv(DATA_FILE)
     else:
-        # Datos iniciales de prueba
         df = pd.DataFrame([
             {
                 "Nombre": "Curso Resina Epoxica",
@@ -79,25 +78,21 @@ def save_data(df):
 
 def calculate_score(comision, temperatura, vistas, cierre):
     score = 0
-    # Comisión (hasta 30 pts)
     if comision >= 35: score += 30
     elif comision >= 20: score += 22
     elif comision >= 10: score += 14
     else: score += 5
     
-    # Temperatura (hasta 25 pts)
     if 20 <= temperatura <= 75: score += 25
     elif 75 < temperatura <= 150: score += 16
     elif temperatura < 20: score += 8
     else: score += 5
     
-    # Vistas Virales (hasta 35 pts)
     if vistas >= 500000: score += 35
     elif vistas >= 100000: score += 28
     elif vistas >= 30000: score += 18
     elif vistas > 0: score += 8
     
-    # Cierre WhatsApp (hasta 10 pts)
     if "whatsapp" in str(cierre).lower(): score += 10
     else: score += 7
     
@@ -105,7 +100,7 @@ def calculate_score(comision, temperatura, vistas, cierre):
 
 df = load_data()
 
-# Barra lateral: Configuración y Clave API
+# Barra lateral
 st.sidebar.title("🔥 Hotmart Spy V1")
 api_key = st.sidebar.text_input("🔑 Gemini API Key:", type="password", placeholder="Pega tu clave aquí")
 
@@ -118,7 +113,6 @@ tab1, tab2, tab3 = st.tabs(["📊 Radar de Ganadores", "➕ Agregar Producto", "
 with tab1:
     st.header("🎯 Radar de Productos y Métricas")
     
-    # Tarjetas Métricas
     col1, col2, col3 = st.columns(3)
     col1.metric("Total Productos", len(df))
     col2.metric("Mejor Score Ganador", f"{int(df['Score'].max())} pts" if not df.empty else "0")
@@ -126,14 +120,12 @@ with tab1:
     
     st.markdown("---")
     
-    # Filtros
     nichos = ["Todos"] + list(df["Nicho"].unique())
     nicho_sel = st.selectbox("Filtrar por Nicho:", nichos)
     
     df_filtered = df if nicho_sel == "Todos" else df[df["Nicho"] == nicho_sel]
     df_filtered = df_filtered.sort_values(by="Score", ascending=False)
     
-    # Tabla estilizada
     st.dataframe(
         df_filtered,
         use_container_width=True,
@@ -198,9 +190,16 @@ with tab3:
     else:
         try:
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel("gemini-1.5-flash")
             
-            # Selector de producto para analizar
+            # Detección inteligente de modelo disponible
+            try:
+                models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+                selected_model = next((m for m in models if "flash" in m), models[0] if models else "gemini-2.5-flash")
+            except:
+                selected_model = "gemini-2.5-flash"
+                
+            model = genai.GenerativeModel(selected_model)
+            
             prod_opciones = df["Nombre"].tolist()
             prod_seleccionado = st.selectbox("Selecciona un producto de tu base de datos para analizar:", prod_opciones)
             
