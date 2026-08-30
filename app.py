@@ -3,7 +3,6 @@ import pandas as pd
 from google import genai
 import os
 
-# Configuración de página estilo SaaS moderno
 st.set_page_config(
     page_title="Hotmart Spy & Copilot",
     page_icon="🔥",
@@ -11,7 +10,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Estilo visual moderno
 st.markdown("""
     <style>
     .main { background-color: #0e1117; }
@@ -25,7 +23,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Archivo de persistencia de datos
 DATA_FILE = "hotmart_products.csv"
 
 def load_data():
@@ -97,14 +94,12 @@ def calculate_score(comision, temperatura, vistas, cierre):
 
 df = load_data()
 
-# Barra lateral
 st.sidebar.title("🔥 Hotmart Spy V1")
 api_key = st.sidebar.text_input("🔑 Gemini API Key:", type="password", placeholder="Pega tu clave aquí")
 
 st.sidebar.markdown("---")
-st.sidebar.info("💡 **Fórmula Orgánica:** Busca productos con comisiones >$20 USD, temperaturas de 20°-75° y cuentas con videos >100k vistas.")
+st.sidebar.info("💡 **Estrategia Orgánica TikTok + Instagram:**\n- 0 a 1k seguidores: Curiosidad y seguidores.\n- 1k a 3k: Puente a Instagram / Comentarios.\n- 3k+: Venta directa por WhatsApp.")
 
-# Pestañas principales
 tab1, tab2, tab3 = st.tabs(["📊 Radar de Ganadores", "➕ Agregar Producto", "🤖 Copiloto IA (Estratega)"])
 
 with tab1:
@@ -180,47 +175,54 @@ with tab2:
                 st.error("Por favor completa al menos el Nombre y el Nicho.")
 
 with tab3:
-    st.header("🤖 Copiloto IA: Ganchos, Guiones y Estrategia")
+    st.header("🤖 Copiloto IA: Estratega Progresivo (Crecimiento ➔ Ventas)")
     
     if not api_key:
         st.warning("⚠️ Ingresa tu Gemini API Key en la barra lateral izquierda para activar el Asistente.")
     else:
         try:
-            prod_opciones = df["Nombre"].tolist()
-            prod_seleccionado = st.selectbox("Selecciona un producto de tu base de datos para analizar:", prod_opciones)
+            col_sel1, col_sel2 = st.columns(2)
+            with col_sel1:
+                prod_opciones = df["Nombre"].tolist()
+                prod_seleccionado = st.selectbox("Selecciona el producto:", prod_opciones)
+            with col_sel2:
+                fase_estrategica = st.selectbox(
+                    "¿En qué fase está tu cuenta actualmente?",
+                    [
+                        "Fase 1: Crecimiento y Seguidores (0 a 1k) - Cero Venta",
+                        "Fase 2: Comunidad y Puente a Instagram (1k a 3k) - Lead Magnet",
+                        "Fase 3: Cierre de Ventas por WhatsApp (3k+ seguidores)"
+                    ]
+                )
+            
             prod_data = df[df["Nombre"] == prod_seleccionado].iloc[0].to_dict()
             
-            if st.button("🚀 Generar Diagnóstico, 5 Hooks Virales y Guion Completo"):
-                with st.spinner("La IA está analizando los datos y redactando la estrategia..."):
+            if st.button("🚀 Generar Estrategia y Guiones para esta Fase"):
+                with st.spinner("La IA está adaptando los ganchos y guiones a tu fase actual..."):
                     client = genai.Client(api_key=api_key)
                     
                     prompt = f"""
-                    Actúa como un Director Creativo y Estratega de Afiliados Orgánico experto en Hotmart, TikTok y Reels.
-                    Analiza este producto:
+                    Actúa como un Director Creativo y Estratega de Crecimiento en TikTok e Instagram para afiliados de Hotmart.
+                    
+                    DATOS DEL PRODUCTO:
                     - Nombre: {prod_data['Nombre']}
                     - Nicho: {prod_data['Nicho']}
-                    - Precio: ${prod_data['Precio']} USD
                     - Comisión: ${prod_data['Comision']} USD
-                    - Temperatura: {prod_data['Temperatura']}°
-                    - Vistas Video Viral: {prod_data['Vistas_Viral']}
-                    - Cierre: {prod_data['Cierre']}
-                    - Score Calculado: {prod_data['Score']} pts
+                    - Vistas Viral Referencia: {prod_data['Vistas_Viral']}
+                    
+                    FASE ACTUAL DE LA CUENTA:
+                    - {fase_estrategica}
+                    
+                    INSTRUCCIONES CLAVE SEGÚN LA FASE:
+                    - Si es FASE 1 (0 a 1k): NO VENDAS NADA. El objetivo es SOLO viralizar, ganar seguidores y guardados. El CTA debe ser "Sígueme para la parte 2" o "Guarda este video para cuando lo intentes".
+                    - Si es FASE 2 (1k a 3k): El objetivo es llevar tráfico hacia el botón de Instagram en TikTok o pedir comentarios tipo "Comenta HUERTO para enviarte la guía gratis por privado".
+                    - Si es FASE 3 (3k+): Objetivo vender el curso con oferta irresistible y cierre por {prod_data['Cierre']}.
 
-                    Entrega un reporte estructurado, directo y listo para producción:
-                    1. 🎯 VEREDICTO DE ELECCIÓN:
-                       - ¿Por qué sí o no elegirlo?
-                       - Dificultad para crear videos (Baja/Media/Alta) y por qué.
-                    2. 🪝 5 GANCHOS (HOOKS) DE ALTO IMPACTO (Primeros 3 segundos):
-                       - Hook 1 (Curiosidad Visual): Qué mostrar en pantalla + Texto + Audio.
-                       - Hook 2 (Dolor / Deseo): Qué mostrar en pantalla + Texto + Audio.
-                       - Hook 3 (Contraintuitivo / Rompe Mitos): Qué mostrar en pantalla + Texto + Audio.
-                       - Hook 4 (Pregunta filtro): Qué mostrar en pantalla + Texto + Audio.
-                       - Hook 5 (Prueba / Oportunidad): Qué mostrar en pantalla + Texto + Audio.
-                    3. 🎬 GUION VIRAL DE 35 SEGUNDOS:
-                       - [0-3s] Gancho
-                       - [4-15s] Problema y Mecanismo Único
-                       - [16-27s] Demostración / Solución
-                       - [28-35s] Llamado a la Acción (CTA hacia {prod_data['Cierre']})
+                    ENTREGA:
+                    1. 🎯 ENFOQUE DE LA FASE: Qué mentalidad tener esta semana y métrica clave a perseguir.
+                    2. 🪝 5 HOOKS VIRALES (Primeros 3 segundos) adaptados 100% a esta fase.
+                    3. 🎬 2 GUIONES COMPLETOS DE 30 SEGUNDOS (Visual + Texto en Pantalla + Voz en off + CTA exacto de la fase).
+                    4. 📲 ESTRATEGIA SINCRONIZADA (Qué publicar en TikTok y qué historia subir a Instagram).
                     """
                     
                     response = client.models.generate_content(
