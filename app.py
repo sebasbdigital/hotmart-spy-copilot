@@ -94,21 +94,21 @@ def calculate_score(comision, temperatura, vistas, cierre):
 
 df = load_data()
 
-st.sidebar.title("🔥 Hotmart Spy V1")
-api_key = st.sidebar.text_input("🔑 Gemini API Key:", type="password", placeholder="Pega tu clave aquí")
+st.sidebar.title("Hotmart Spy V1")
+api_key = st.sidebar.text_input("Gemini API Key:", type="password", placeholder="Pega tu clave aqui")
 
 st.sidebar.markdown("---")
-st.sidebar.info("💡 **Estrategia Orgánica TikTok + Instagram:**\n- 0 a 1k seguidores: Curiosidad y seguidores.\n- 1k a 3k: Puente a Instagram / Comentarios.\n- 3k+: Venta directa por WhatsApp.")
+st.sidebar.info("Estrategia Organica TikTok + Instagram:\n- 0 a 1k: Curiosidad y seguidores.\n- 1k a 3k: Puente a Instagram / Comentarios.\n- 3k+: Venta directa por WhatsApp.")
 
-tab1, tab2, tab3 = st.tabs(["📊 Radar de Ganadores", "➕ Agregar Producto", "🤖 Copiloto IA (Estratega)"])
+tab1, tab2, tab3 = st.tabs(["Radar de Ganadores", "Agregar Producto", "Copiloto IA (Estratega)"])
 
 with tab1:
-    st.header("🎯 Radar de Productos y Métricas")
+    st.header("Radar de Productos y Metricas")
     
     col1, col2, col3 = st.columns(3)
     col1.metric("Total Productos", len(df))
     col2.metric("Mejor Score Ganador", f"{int(df['Score'].max())} pts" if not df.empty else "0")
-    col3.metric("Comisión Promedio", f"${df['Comision'].mean():.2f} USD" if not df.empty else "$0")
+    col3.metric("Comision Promedio", f"${df['Comision'].mean():.2f} USD" if not df.empty else "$0")
     
     st.markdown("---")
     
@@ -124,7 +124,7 @@ with tab1:
         column_config={
             "Score": st.column_config.ProgressColumn(
                 "Score Ganador",
-                help="Puntuación de 0 a 100",
+                help="Puntuacion de 0 a 100",
                 format="%d pts",
                 min_value=0,
                 max_value=100,
@@ -137,21 +137,21 @@ with tab1:
     )
 
 with tab2:
-    st.header("➕ Cazar y Analizar Nuevo Producto")
+    st.header("Cazar y Analizar Nuevo Producto")
     with st.form("nuevo_producto_form", clear_on_submit=True):
         col_a, col_b = st.columns(2)
         with col_a:
             nombre = st.text_input("Nombre del Curso en Hotmart:")
-            nicho = st.text_input("Nicho / Categoría (ej: Belleza, Mascotas, Oficios):")
+            nicho = st.text_input("Nicho / Categoria (ej: Belleza, Mascotas, Oficios):")
             precio = st.number_input("Precio de Venta ($USD):", min_value=1.0, value=49.0)
-            comision = st.number_input("Tu Comisión Limpia ($USD):", min_value=1.0, value=35.0)
+            comision = st.number_input("Tu Comision Limpia ($USD):", min_value=1.0, value=35.0)
         with col_b:
             temperatura = st.number_input("Temperatura en Hotmart (0 a 150):", min_value=0, max_value=150, value=40)
-            vistas = st.number_input("Vistas del Video más Viral en TikTok:", min_value=0, value=250000)
+            vistas = st.number_input("Vistas del Video mas Viral en TikTok:", min_value=0, value=250000)
             cierre = st.selectbox("Estrategia de Cierre:", ["WhatsApp", "Web Directa"])
             cuenta = st.text_input("Cuenta de Referencia (ej: @cuenta_tiktok):")
             
-        submitted = st.form_submit_button("🔥 Calcular Score y Guardar")
+        submitted = st.form_submit_button("Calcular Score y Guardar")
         
         if submitted:
             if nombre and nicho:
@@ -169,16 +169,16 @@ with tab2:
                 }
                 df = pd.concat([df, pd.DataFrame([nuevo_prod])], ignore_index=True)
                 save_data(df)
-                st.success(f"¡Producto '{nombre}' agregado con éxito! Score Ganador: {score_calc} pts.")
+                st.success(f"Producto '{nombre}' agregado con exito. Score Ganador: {score_calc} pts.")
                 st.rerun()
             else:
                 st.error("Por favor completa al menos el Nombre y el Nicho.")
 
 with tab3:
-    st.header("🤖 Copiloto IA: Estratega Progresivo (Crecimiento ➔ Ventas)")
+    st.header("Copiloto IA: Estratega Progresivo (Crecimiento a Ventas)")
     
     if not api_key:
-        st.warning("⚠️ Ingresa tu Gemini API Key en la barra lateral izquierda para activar el Asistente.")
+        st.warning("Ingresa tu Gemini API Key en la barra lateral izquierda para activar el Asistente.")
     else:
         try:
             col_sel1, col_sel2 = st.columns(2)
@@ -187,7 +187,7 @@ with tab3:
                 prod_seleccionado = st.selectbox("Selecciona el producto:", prod_opciones)
             with col_sel2:
                 fase_estrategica = st.selectbox(
-                    "¿En qué fase está tu cuenta actualmente?",
+                    "En que fase esta tu cuenta actualmente?",
                     [
                         "Fase 1: Crecimiento y Seguidores (0 a 1k) - Cero Venta",
                         "Fase 2: Comunidad y Puente a Instagram (1k a 3k) - Lead Magnet",
@@ -197,32 +197,37 @@ with tab3:
             
             prod_data = df[df["Nombre"] == prod_seleccionado].iloc[0].to_dict()
             
-            if st.button("🚀 Generar Estrategia y Guiones para esta Fase"):
-                with st.spinner("La IA está adaptando los ganchos y guiones a tu fase actual..."):
+            if st.button("Generar Estrategia y Guiones para esta Fase"):
+                with st.spinner("La IA esta adaptando los ganchos y guiones a tu fase actual..."):
                     client = genai.Client(api_key=api_key)
                     
                     prompt = f"""
-                    Actúa como un Director Creativo y Estratega de Crecimiento en TikTok e Instagram para afiliados de Hotmart.
+                    Actua como un Director Creativo y Estratega de Crecimiento en TikTok e Instagram para afiliados de Hotmart.
                     
                     DATOS DEL PRODUCTO:
                     - Nombre: {prod_data['Nombre']}
                     - Nicho: {prod_data['Nicho']}
-                    - Comisión: ${prod_data['Comision']} USD
+                    - Comision: ${prod_data['Comision']} USD
                     - Vistas Viral Referencia: {prod_data['Vistas_Viral']}
                     
                     FASE ACTUAL DE LA CUENTA:
                     - {fase_estrategica}
                     
-                    INSTRUCCIONES CLAVE SEGÚN LA FASE:
-                    - Si es FASE 1 (0 a 1k): NO VENDAS NADA. El objetivo es SOLO viralizar, ganar seguidores y guardados. El CTA debe ser "Sígueme para la parte 2" o "Guarda este video para cuando lo intentes".
-                    - Si es FASE 2 (1k a 3k): El objetivo es llevar tráfico hacia el botón de Instagram en TikTok o pedir comentarios tipo "Comenta HUERTO para enviarte la guía gratis por privado".
-                    - Si es FASE 3 (3k+): Objetivo vender el curso con oferta irresistible y cierre por {prod_data['Cierre']}.
+                    REGLAS OBLIGATORIAS POR FASE:
+                    - Si es FASE 1 (0 a 1k): NO VENDAS NADA. El objetivo es SOLO viralizar, ganar seguidores y guardados. El llamado a la accion (CTA) debe ser 'Sigueme para ver la parte 2' o 'Guarda este tip para cuando lo intentes'.
+                    - Si es FASE 2 (1k a 3k): El objetivo es llevar trafico hacia el boton de Instagram o pedir comentarios como 'Comenta HUERTO para enviarte la guia gratuita por privado'.
+                    - Si es FASE 3 (3k+): Objetivo vender el curso con oferta irresistible y cierre por WhatsApp.
 
-                    ENTREGA:
-                    1. 🎯 ENFOQUE DE LA FASE: Qué mentalidad tener esta semana y métrica clave a perseguir.
-                    2. 🪝 5 HOOKS VIRALES (Primeros 3 segundos) adaptados 100% a esta fase.
-                    3. 🎬 2 GUIONES COMPLETOS DE 30 SEGUNDOS (Visual + Texto en Pantalla + Voz en off + CTA exacto de la fase).
-                    4. 📲 ESTRATEGIA SINCRONIZADA (Qué publicar en TikTok y qué historia subir a Instagram).
+                    ENTREGA TU REPORTE CON ESTA ESTRUCTURA EXACTA:
+                    1. ENFOQUE DE LA FASE: Metrica principal a perseguir y estrategia clave de esta semana.
+                    2. 5 HOOKS VIRALES (Primeros 3 segundos):
+                       - Hook 1 (Curiosidad Visual): Que mostrar en pantalla + Texto + Audio hablado.
+                       - Hook 2 (Dolor / Error comun): Que mostrar en pantalla + Texto + Audio hablado.
+                       - Hook 3 (Contraintuitivo / Rompe Mitos): Que mostrar en pantalla + Texto + Audio hablado.
+                       - Hook 4 (Pregunta filtro): Que mostrar en pantalla + Texto + Audio hablado.
+                       - Hook 5 (Resultado rapido): Que mostrar en pantalla + Texto + Audio hablado.
+                    3. 2 GUIONES COMPLETOS DE 30 SEGUNDOS (Desglose segundo a segundo con Visual, Texto, Voz y el CTA exacto de la fase).
+                    4. ESTRATEGIA SINCRONIZADA TIKTOK + INSTAGRAM (Que publicar en TikTok y como apalancarlo en historias/reels de Instagram).
                     """
                     
                     response = client.models.generate_content(
