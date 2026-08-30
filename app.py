@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import google.generativeai as genai
+from google import genai
 import os
 
 # Configuración de página estilo SaaS moderno
@@ -22,9 +22,6 @@ st.markdown("""
         border: 1px solid #2d3139;
         text-align: center;
     }
-    .winner-tag { color: #00ff88; font-weight: bold; }
-    .warning-tag { color: #ffbb00; font-weight: bold; }
-    .danger-tag { color: #ff4b4b; font-weight: bold; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -189,18 +186,14 @@ with tab3:
         st.warning("⚠️ Ingresa tu Gemini API Key en la barra lateral izquierda para activar el Asistente.")
     else:
         try:
-            genai.configure(api_key=api_key)
-            
-            # Usar directamente el modelo oficial 3.6-flash
-            model = genai.GenerativeModel("gemini-3.6-flash")
-            
             prod_opciones = df["Nombre"].tolist()
             prod_seleccionado = st.selectbox("Selecciona un producto de tu base de datos para analizar:", prod_opciones)
-            
             prod_data = df[df["Nombre"] == prod_seleccionado].iloc[0].to_dict()
             
             if st.button("🚀 Generar Diagnóstico, 5 Hooks Virales y Guion Completo"):
                 with st.spinner("La IA está analizando los datos y redactando la estrategia..."):
+                    client = genai.Client(api_key=api_key)
+                    
                     prompt = f"""
                     Actúa como un Director Creativo y Estratega de Afiliados Orgánico experto en Hotmart, TikTok y Reels.
                     Analiza este producto:
@@ -213,7 +206,7 @@ with tab3:
                     - Cierre: {prod_data['Cierre']}
                     - Score Calculado: {prod_data['Score']} pts
 
-                    Entrega un reporte estructurado y directo:
+                    Entrega un reporte estructurado, directo y listo para producción:
                     1. 🎯 VEREDICTO DE ELECCIÓN:
                        - ¿Por qué sí o no elegirlo?
                        - Dificultad para crear videos (Baja/Media/Alta) y por qué.
@@ -229,7 +222,11 @@ with tab3:
                        - [16-27s] Demostración / Solución
                        - [28-35s] Llamado a la Acción (CTA hacia {prod_data['Cierre']})
                     """
-                    response = model.generate_content(prompt)
+                    
+                    response = client.models.generate_content(
+                        model="gemini-2.5-flash",
+                        contents=prompt
+                    )
                     st.markdown(response.text)
         except Exception as e:
             st.error(f"Error al conectar con la IA: {e}")
