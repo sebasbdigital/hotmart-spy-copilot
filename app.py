@@ -108,7 +108,7 @@ with tab1:
     col1, col2, col3 = st.columns(3)
     col1.metric("Total Productos", len(df))
     col2.metric("Mejor Score Ganador", f"{int(df['Score'].max())} pts" if not df.empty else "0")
-    col3.metric("Comision Promedio", f"${df['Comision'].mean():.2f} USD" if not df.empty else "$0")
+    col3.metric("Comisión Promedio", f"${df['Comision'].mean():.2f} USD" if not df.empty else "$0")
     
     st.markdown("---")
     
@@ -198,7 +198,7 @@ with tab3:
             prod_data = df[df["Nombre"] == prod_seleccionado].iloc[0].to_dict()
             
             if st.button("Generar Estrategia y Guiones para esta Fase"):
-                with st.spinner("Conectando con la IA y redactando estrategia..."):
+                with st.spinner("Generando estrategia con IA..."):
                     client = genai.Client(api_key=api_key)
                     
                     prompt = f"""
@@ -230,25 +230,18 @@ with tab3:
                     4. ESTRATEGIA SINCRONIZADA TIKTOK + INSTAGRAM (Que publicar en TikTok y como apalancarlo en Instagram).
                     """
                     
-                    # Lista de modelos con respaldo automático
-                    modelos = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-pro"]
-                    respuesta_texto = None
-                    
-                    for mod in modelos:
-                        try:
-                            res = client.models.generate_content(
-                                model=mod,
-                                contents=prompt
-                            )
-                            if res and res.text:
-                                respuesta_texto = res.text
-                                break
-                        except Exception:
-                            continue
-                            
-                    if respuesta_texto:
-                        st.markdown(respuesta_texto)
-                    else:
-                        st.error("Los servidores de IA están saturados temporalmente. Intenta nuevamente en 30 segundos.")
+                    try:
+                        interaction = client.interactions.create(
+                            model="gemini-3.5-flash",
+                            input=prompt
+                        )
+                        st.markdown(interaction.output_text)
+                    except Exception:
+                        response = client.models.generate_content(
+                            model="gemini-2.0-flash",
+                            contents=prompt
+                        )
+                        st.markdown(response.text)
+                        
         except Exception as e:
             st.error(f"Error: {e}")
