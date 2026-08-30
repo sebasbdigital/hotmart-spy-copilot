@@ -191,14 +191,8 @@ with tab3:
         try:
             genai.configure(api_key=api_key)
             
-            # Detección inteligente de modelo disponible
-            try:
-                models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-                selected_model = next((m for m in models if "flash" in m), models[0] if models else "gemini-2.5-flash")
-            except:
-                selected_model = "gemini-2.5-flash"
-                
-            model = genai.GenerativeModel(selected_model)
+            # Usar directamente el modelo oficial 3.6-flash
+            model = genai.GenerativeModel("gemini-3.6-flash")
             
             prod_opciones = df["Nombre"].tolist()
             prod_seleccionado = st.selectbox("Selecciona un producto de tu base de datos para analizar:", prod_opciones)
